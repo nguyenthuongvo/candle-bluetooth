@@ -1,11 +1,59 @@
-document.querySelector('#connect').addEventListener('click', function(event) {
-  /* Clicking this button will attempt to connect to the PLAYBULB Candle and
-   * read some values such as Device Name and Battery Level. */
+document.querySelector('#connect').addEventListener('click', event => {
+  document.querySelector('#state').classList.add('connecting');
+  playbulbCandle.connect()
+  .then(() => {
+    console.log(playbulbCandle.device);
+    document.querySelector('#state').classList.remove('connecting');
+    document.querySelector('#state').classList.add('connected');
+    return playbulbCandle.getDeviceName().then(handleDeviceName)
+    .then(() => playbulbCandle.getBatteryLevel().then(handleBatteryLevel));
+  })
+  .catch(error => {
+    console.error('Argh!', error);
+  });
 });
 
-function changeColor() {
-  /* This function is called when user clicks on an effect radio button. */
+function handleDeviceName(deviceName) {
+  document.querySelector('#deviceName').value = deviceName;
 }
+
+function handleBatteryLevel(batteryLevel) {
+  document.querySelector('#batteryLevel').textContent = batteryLevel + '%';
+}
+
+function changeColor() {
+  var effect = document.querySelector('[name="effectSwitch"]:checked').id;
+  switch(effect) {
+    case 'noEffect':
+      playbulbCandle.setColor(r, g, b).then(onColorChanged);
+      break;
+    case 'candleEffect':
+      playbulbCandle.setCandleEffectColor(r, g, b).then(onColorChanged);
+      break;
+    case 'flashing':
+      playbulbCandle.setFlashingColor(r, g, b).then(onColorChanged);
+      break;
+    case 'pulse':
+      playbulbCandle.setPulseColor(r, g, b).then(onColorChanged);
+      break;
+    case 'rainbow':
+      playbulbCandle.setRainbow().then(onColorChanged);
+      break;
+    case 'rainbowFade':
+      playbulbCandle.setRainbowFade().then(onColorChanged);
+      break;
+  }
+}
+
+document.querySelector('#deviceName').addEventListener('input', event => {
+  playbulbCandle.setDeviceName(event.target.value)
+  .then(() => {
+    console.log('Device name changed to ' + event.target.value);
+  })
+  .catch(error => {
+    console.error('Argh!', error);
+  });
+});
 
 var r = g = b = 255;
 
