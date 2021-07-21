@@ -1,8 +1,8 @@
 /*Program to use GATT service on ESP32 to send Battery Level
- * ESP32 works as server - Mobile as client
- * Program by: B.Aswinth Raj
- * Dated on: 13-10-2018
- * Website: www.circuitdigest.com
+ * ESP32 works as Play Bulb Candle
+ * Program by: Vo.Nguyen
+ * Dated on: 21-07-2021
+ * Description: The 5nd day of COVID 19 Social Distancing
  */
 
 #include <Arduino.h>
