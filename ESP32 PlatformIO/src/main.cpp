@@ -11,9 +11,8 @@
 #include <BLEServer.h> //Library to use BLE as server
 #include <BLE2902.h> 
 
-bool _BLEClientConnected = false;
-
 BLEServer* pServer = NULL;
+uint8_t level = 57;
 
 // Optional Services
 #define BatteryService BLEUUID((uint16_t)0x180F) 
@@ -37,11 +36,10 @@ BLEDescriptor EffectDescriptor(BLEUUID((uint16_t)0x2901));
 
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
-      _BLEClientConnected = true;
     };
 
     void onDisconnect(BLEServer* pServer) {
-      _BLEClientConnected = false;
+      pServer->getAdvertising()->start();
     }
 };
 
@@ -98,7 +96,7 @@ class EffecctCharacteristicCallbacks: public BLECharacteristicCallbacks {
 
 
 void InitBLE() {
-  BLEDevice::init("BLE Battery");
+  BLEDevice::init("ESP32");
   // Create the BLE Server
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
@@ -152,25 +150,19 @@ void InitBLE() {
 
   // Start advertising
   pServer->getAdvertising()->start();
-  _BLEClientConnected = true;
 }
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Battery Level Indicator - BLE");
   InitBLE();
+  BatteryLevelCharacteristic.setValue(&level, level);
+  BatteryLevelCharacteristic.notify();
 }
 
-
-uint8_t level = 57;
   
 void loop() {
 
     delay(1000);
-    if (_BLEClientConnected == false) {
-      Serial.println("ESP32 start adverising....");
-      pServer->getAdvertising()->start();
-    }
-    
 
 }
